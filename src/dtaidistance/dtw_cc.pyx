@@ -122,6 +122,16 @@ cdef class DTWSettings:
                 self._settings.penalty = 0
             else:
                 self._settings.penalty = kwargs["penalty"]
+        if "penalty_s1" in kwargs:
+            if kwargs["penalty_s1"] is None:
+                self._settings.penalty_s1 = 0
+            else:
+                self._settings.penalty_s1 = kwargs["penalty_s1"]
+        if "penalty_s2" in kwargs:
+            if kwargs["penalty_s2"] is None:
+                self._settings.penalty_s2 = 0
+            else:
+                self._settings.penalty_s2 = kwargs["penalty_s2"]
         if "psi" in kwargs:
             if kwargs["psi"] is None:
                 self._settings.psi_1b = 0
@@ -180,6 +190,14 @@ cdef class DTWSettings:
         return self._settings.penalty
 
     @property
+    def penalty_s1(self):
+        return self._settings.penalty_s1
+
+    @property
+    def penalty_s2(self):
+        return self._settings.penalty_s2
+
+    @property
     def psi(self):
         return {
             '1b': self._settings.psi_1b,
@@ -209,6 +227,8 @@ cdef class DTWSettings:
             f"  max_step = {self.max_step}\n"
             f"  max_length_diff = {self.max_length_diff}\n"
             f"  penalty = {self.penalty}\n"
+            f"  penalty_s1 = {self.penalty_s1}\n"
+            f"  penalty_s2 = {self.penalty_s2}\n"
             f"  psi = {self.psi}\n"
             f"  use_pruning = {self.use_pruning}\n"
             f"  inner_dist = {self.inner_dist}\n"

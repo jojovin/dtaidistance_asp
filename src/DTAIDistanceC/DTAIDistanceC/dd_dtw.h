@@ -62,6 +62,8 @@ seq_t max_dist;
     seq_t max_step;
     idx_t max_length_diff;
     seq_t penalty;
+    seq_t penalty_s1;  // penalty for compressing/expanding in series 1
+    seq_t penalty_s2;  // penalty for compressing/expanding in series 2
     idx_t psi_1b;  // series 1, begin psi
     idx_t psi_1e;  // series 1, end psi
     idx_t psi_2b;  // series 2, begin psi
@@ -105,6 +107,8 @@ struct DTWWps_s {
     seq_t max_step;
     seq_t max_dist;
     seq_t penalty;
+    seq_t penalty_s1;
+    seq_t penalty_s2;
 };
 typedef struct DTWWps_s DTWWps;
 

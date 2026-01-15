@@ -103,7 +103,8 @@ def _check_library(include_omp=False, raise_exception=True):
 
 class DTWSettings:
     def __init__(self, window=None, use_pruning=False, max_dist=None, max_step=None,
-                 max_length_diff=None, penalty=None, psi=None, inner_dist=innerdistance.default,
+                 max_length_diff=None, penalty=None, penalty_s1=None, penalty_s2=None, 
+                 psi=None, inner_dist=innerdistance.default,
                  use_ndim=False, use_c=False):
         """Settings for Dynamic Time Warping distance methods.
 
@@ -120,7 +121,9 @@ class DTWSettings:
             If the difference between two values in the two series is larger than this, thus
             if ``|s1[i]-s2[j]| > max_step``, replace that value with infinity.
         :param max_length_diff: Return infinity if length of two series is larger
-        :param penalty: Penalty to add if compression or expansion is applied
+        :param penalty: Penalty to add if compression or expansion is applied (symmetric)
+        :param penalty_s1: Penalty to add when expanding series 1 (asymmetric, overrides penalty)
+        :param penalty_s2: Penalty to add when expanding series 2 (asymmetric, overrides penalty)
         :param psi: Psi relaxation parameter (ignore start and end of matching).
             If psi is a single integer, it is used for both start and end relaxations of both series.
             If psi is a 4-tuple, it is used as the psi-relaxation for
@@ -144,6 +147,8 @@ class DTWSettings:
         self.max_step = max_step
         self.max_length_diff = max_length_diff
         self.penalty = penalty
+        self.penalty_s1 = penalty_s1
+        self.penalty_s2 = penalty_s2
         self.psi = psi
         self.inner_dist = inner_dist
         self.use_ndim = use_ndim
@@ -165,6 +170,21 @@ class DTWSettings:
             self.adj_penalty = 0
         else:
             self.adj_penalty = inner_val(self.penalty)
+
+        if not self.penalty_s1:
+            self.adj_penalty_s1 = 0
+        else:
+            self.adj_penalty_s1 = inner_val(self.penalty_s1)
+
+        if not self.penalty_s2:
+            self.adj_penalty_s2 = 0
+        else:
+            self.adj_penalty_s2 = inner_val(self.penalty_s2)
+
+        # Backward compatibility: if asymmetric penalties not set, use symmetric penalty
+        if self.adj_penalty_s1 == 0 and self.adj_penalty_s2 == 0 and self.adj_penalty != 0:
+            self.adj_penalty_s1 = self.adj_penalty
+            self.adj_penalty_s2 = self.adj_penalty
 
         if self.max_length_diff is None:
             self.adj_max_length_diff = inf
@@ -207,6 +227,8 @@ class DTWSettings:
             'max_step': self.max_step,
             'max_length_diff': self.max_length_diff,
             'penalty': self.penalty,
+            'penalty_s1': self.penalty_s1,
+            'penalty_s2': self.penalty_s2,
             'psi': self.psi,
             'inner_dist': self.inner_dist,
             'use_ndim': self.use_ndim,
@@ -220,6 +242,8 @@ class DTWSettings:
         max_length_diff = 0 if (self.max_length_diff is None or math.isinf(self.max_length_diff)) \
             else self.max_length_diff
         penalty = 0 if self.penalty is None else self.penalty
+        penalty_s1 = 0 if self.penalty_s1 is None else self.penalty_s1
+        penalty_s2 = 0 if self.penalty_s2 is None else self.penalty_s2
         psi = 0 if self.psi is None else self.psi
         use_pruning = 0 if self.use_pruning is None else self.use_pruning
         inner_dist = innerdistance.to_c(self.inner_dist)
@@ -229,6 +253,8 @@ class DTWSettings:
             'max_step': max_step,
             'max_length_diff': max_length_diff,
             'penalty': penalty,
+            'penalty_s1': penalty_s1,
+            'penalty_s2': penalty_s2,
             'psi': psi,
             'use_pruning': use_pruning,
             'inner_dist': inner_dist
@@ -368,8 +394,8 @@ def distance(s1, s2, **kwargs) -> float:
             assert j + 1 - skipp >= 0
             assert j - skip >= 0
             dtw[i1 * length + j + 1 - skip] = d + min(dtw[i0 * length + j - skipp],
-                                                      dtw[i0 * length + j + 1 - skipp] + s.adj_penalty,
-                                                      dtw[i1 * length + j - skip] + s.adj_penalty)
+                                                      dtw[i0 * length + j + 1 - skipp] + s.adj_penalty_s1,
+                                                      dtw[i1 * length + j - skip] + s.adj_penalty_s2)
             # print('({},{}), ({},{}), ({},{})'.format(i0, j - skipp, i0, j + 1 - skipp, i1, j - skip))
             # print('{}, {}, {}'.format(dtw[i0, j - skipp], dtw[i0, j + 1 - skipp], dtw[i1, j - skip]))
             # print('i={}, j={}, d={}, skip={}, skipp={}'.format(i,j,d,skip,skipp))
@@ -485,8 +511,8 @@ def warping_paths(s1, s2, psi_neg=True, keep_int_repr=False, **kwargs):
             if s.adj_max_step is not None and d > s.adj_max_step:
                 continue
             dtw[i1, j + 1] = d + min(dtw[i0, j],
-                                     dtw[i0, j + 1] + s.adj_penalty,
-                                     dtw[i1, j] + s.adj_penalty)
+                                     dtw[i0, j + 1] + s.adj_penalty_s1,
+                                     dtw[i1, j] + s.adj_penalty_s2)
             if dtw[i1, j + 1] > s.adj_max_dist:
                 if not smaller_found:
                     sc = j + 1

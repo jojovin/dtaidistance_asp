@@ -22,6 +22,8 @@ DTWSettings dtw_settings_default(void) {
         .max_step = 0,
         .max_length_diff = 0,
         .penalty = 0,
+        .penalty_s1 = 0,
+        .penalty_s2 = 0,
         .psi_1b = 0,
         .psi_1e = 0,
         .psi_2b = 0,
@@ -100,6 +102,8 @@ seq_t dtw_distance(seq_t *s1, idx_t l1,
     seq_t max_step = settings->max_step;
     seq_t max_dist = settings->max_dist;
     seq_t penalty = settings->penalty;
+    seq_t penalty_horizontal = settings->penalty_s2;  // vertical move in matrix (down) = expanding s2
+    seq_t penalty_vertical = settings->penalty_s1;    // horizontal move in matrix (right) = expanding s1
 
     #ifdef DTWDEBUG
     printf("r=%zu, c=%zu\n", l1, l2);
@@ -130,7 +134,13 @@ seq_t dtw_distance(seq_t *s1, idx_t l1,
     } else {
         max_step = pow(max_step, 2);
     }
-    penalty = pow(penalty, 2);
+    // For backward compatibility: if asymmetric penalties are not set, use symmetric penalty
+    if (penalty_horizontal == 0 && penalty_vertical == 0 && penalty != 0) {
+        penalty_horizontal = penalty;
+        penalty_vertical = penalty;
+    }
+    penalty_horizontal = pow(penalty_horizontal, 2);
+    penalty_vertical = pow(penalty_vertical, 2);
     // rows is for series 1, columns is for series 2
     idx_t length = MIN(l2+1, ldiff + 2*window + 1);
     assert(length > 0);
@@ -224,12 +234,12 @@ seq_t dtw_distance(seq_t *s1, idx_t l1,
             curidx = i0 * length + j - skipp;
             minv = dtw[curidx];
             curidx += 1;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_horizontal;
             if (tempv < minv) {
                 minv = tempv;
             }
             curidx = i1 * length + j - skip;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_vertical;
             if (tempv < minv) {
                 minv = tempv;
             }
@@ -333,6 +343,8 @@ seq_t dtw_distance_ndim(seq_t *s1, idx_t l1,
     seq_t max_step = settings->max_step;
     seq_t max_dist = settings->max_dist;
     seq_t penalty = settings->penalty;
+    seq_t penalty_horizontal = settings->penalty_s2;  // vertical move in matrix (down) = expanding s2
+    seq_t penalty_vertical = settings->penalty_s1;    // horizontal move in matrix (right) = expanding s1
 
     #ifdef DTWDEBUG
     printf("r=%zu, c=%zu\n", l1, l2);
@@ -363,7 +375,13 @@ seq_t dtw_distance_ndim(seq_t *s1, idx_t l1,
     } else {
         max_step = pow(max_step, 2);
     }
-    penalty = pow(penalty, 2);
+    // For backward compatibility: if asymmetric penalties are not set, use symmetric penalty
+    if (penalty_horizontal == 0 && penalty_vertical == 0 && penalty != 0) {
+        penalty_horizontal = penalty;
+        penalty_vertical = penalty;
+    }
+    penalty_horizontal = pow(penalty_horizontal, 2);
+    penalty_vertical = pow(penalty_vertical, 2);
     // rows is for series 1, columns is for series 2
     idx_t length = MIN(l2+1, ldiff + 2*window + 1);
     assert(length > 0);
@@ -464,12 +482,12 @@ seq_t dtw_distance_ndim(seq_t *s1, idx_t l1,
             curidx = i0 * length + j - skipp;
             minv = dtw[curidx];
             curidx += 1;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_horizontal;
             if (tempv < minv) {
                 minv = tempv;
             }
             curidx = i1 * length + j - skip;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_vertical;
             if (tempv < minv) {
                 minv = tempv;
             }
@@ -569,6 +587,8 @@ seq_t dtw_distance_euclidean(seq_t *s1, idx_t l1,
     seq_t max_step = settings->max_step;
     seq_t max_dist = settings->max_dist;
     seq_t penalty = settings->penalty;
+    seq_t penalty_horizontal = settings->penalty_s2;  // vertical move in matrix (down) = expanding s2
+    seq_t penalty_vertical = settings->penalty_s1;    // horizontal move in matrix (right) = expanding s1
 
     #ifdef DTWDEBUG
     printf("r=%zu, c=%zu\n", l1, l2);
@@ -598,7 +618,13 @@ seq_t dtw_distance_euclidean(seq_t *s1, idx_t l1,
     } else {
         max_step = pow(max_step, 2);
     }
-    penalty = pow(penalty, 2);
+    // For backward compatibility: if asymmetric penalties are not set, use symmetric penalty
+    if (penalty_horizontal == 0 && penalty_vertical == 0 && penalty != 0) {
+        penalty_horizontal = penalty;
+        penalty_vertical = penalty;
+    }
+    penalty_horizontal = pow(penalty_horizontal, 2);
+    penalty_vertical = pow(penalty_vertical, 2);
     // rows is for series 1, columns is for series 2
     idx_t length = MIN(l2+1, ldiff + 2*window + 1);
     assert(length > 0);
@@ -692,12 +718,12 @@ seq_t dtw_distance_euclidean(seq_t *s1, idx_t l1,
             curidx = i0 * length + j - skipp;
             minv = dtw[curidx];
             curidx += 1;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_horizontal;
             if (tempv < minv) {
                 minv = tempv;
             }
             curidx = i1 * length + j - skip;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_vertical;
             if (tempv < minv) {
                 minv = tempv;
             }
@@ -798,6 +824,8 @@ seq_t dtw_distance_ndim_euclidean(seq_t *s1, idx_t l1,
     seq_t max_step = settings->max_step;
     seq_t max_dist = settings->max_dist;
     seq_t penalty = settings->penalty;
+    seq_t penalty_horizontal = settings->penalty_s2;  // vertical move in matrix (down) = expanding s2
+    seq_t penalty_vertical = settings->penalty_s1;    // horizontal move in matrix (right) = expanding s1
 
     #ifdef DTWDEBUG
     printf("r=%zu, c=%zu\n", l1, l2);
@@ -827,7 +855,13 @@ seq_t dtw_distance_ndim_euclidean(seq_t *s1, idx_t l1,
     } else {
         max_step = pow(max_step, 2);
     }
-    penalty = pow(penalty, 2);
+    // For backward compatibility: if asymmetric penalties are not set, use symmetric penalty
+    if (penalty_horizontal == 0 && penalty_vertical == 0 && penalty != 0) {
+        penalty_horizontal = penalty;
+        penalty_vertical = penalty;
+    }
+    penalty_horizontal = pow(penalty_horizontal, 2);
+    penalty_vertical = pow(penalty_vertical, 2);
     // rows is for series 1, columns is for series 2
     idx_t length = MIN(l2+1, ldiff + 2*window + 1);
     assert(length > 0);
@@ -929,12 +963,12 @@ seq_t dtw_distance_ndim_euclidean(seq_t *s1, idx_t l1,
             curidx = i0 * length + j - skipp;
             minv = dtw[curidx];
             curidx += 1;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_horizontal;
             if (tempv < minv) {
                 minv = tempv;
             }
             curidx = i1 * length + j - skip;
-            tempv = dtw[curidx] + penalty;
+            tempv = dtw[curidx] + penalty_vertical;
             if (tempv < minv) {
                 minv = tempv;
             }
@@ -4088,6 +4122,14 @@ seq_t dtw_warping_paths_full_ndim_twice(seq_t *wps,
     const idx_t inf_rows = 1;
     idx_t width = l2 + inf_cols;
     const seq_t penalty = settings->penalty;
+    seq_t penalty_horizontal = settings->penalty_s2;  // vertical move in matrix (down) = expanding s2
+    seq_t penalty_vertical = settings->penalty_s1;    // horizontal move in matrix (right) = expanding s1
+    
+    // For backward compatibility: if asymmetric penalties are not set, use symmetric penalty
+    if (penalty_horizontal == 0 && penalty_vertical == 0 && penalty != 0) {
+        penalty_horizontal = penalty;
+        penalty_vertical = penalty;
+    }
 
     idx_t ri, ci, wpsi;
     seq_t d;
@@ -4144,9 +4186,9 @@ seq_t dtw_warping_paths_full_ndim_twice(seq_t *wps,
                 d += SEDIST(s1[ri_idx + d_i], s2[ci_idx + d_i]);
             }
             // Steps: typeI (0, 1), (1, 1), (1, 0)
-            values[0] = wps[ri_width  + wpsi - 1] + penalty;  // left
-            values[1] = wps[ri_widthp + wpsi - 1];            // diagonal
-            values[2] = wps[ri_widthp + wpsi]     + penalty;  // up
+            values[0] = wps[ri_width  + wpsi - 1] + penalty_horizontal;  // left (horizontal)
+            values[1] = wps[ri_widthp + wpsi - 1];                        // diagonal
+            values[2] = wps[ri_widthp + wpsi]     + penalty_vertical;    // up (vertical)
             if (values[0] <= values[1] && values[0] <= values[2]) {
                 values_idx = 0;
             } else if (values[1] <= values[2]) {

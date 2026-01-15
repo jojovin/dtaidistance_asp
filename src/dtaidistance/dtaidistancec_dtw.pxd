@@ -9,6 +9,8 @@ cdef extern from "dd_dtw.h":
         seq_t max_step
         Py_ssize_t max_length_diff
         seq_t penalty
+        seq_t penalty_s1
+        seq_t penalty_s2
         Py_ssize_t psi_1b
         Py_ssize_t psi_1e
         Py_ssize_t psi_2b
@@ -38,6 +40,8 @@ cdef extern from "dd_dtw.h":
         seq_t max_step
         seq_t max_dist
         seq_t penalty
+        seq_t penalty_s1
+        seq_t penalty_s2
 
     DTWSettings dtw_settings_default()
     Py_ssize_t dtw_settings_wps_length(Py_ssize_t l1, Py_ssize_t l2, DTWSettings *settings)
