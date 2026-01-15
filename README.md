@@ -4,7 +4,17 @@
 [![DOI](https://zenodo.org/badge/80764246.svg)](https://zenodo.org/badge/latestdoi/80764246) 
 
 # This version includes asymmetric expansion/compression penalties
-It is fully compatible with the original version though.
+It is fully compatible with the original version though. 
+Install instructions identical to the original version source install. 
+
+Use: 
+```python
+from dtaidistance import dtw
+settings = dtw.DTWSettings(penalty_s1=1.0, penalty_s2=0.5)
+d = dtw.distance(s1, s2, settings=settings)
+```
+
+Setting penalty_s1 and penalty_s2 will override penalty if set, but penalty can still be used for symmetric penalties ensuring backward compatibility.
 
 # Time Series Distances
 
