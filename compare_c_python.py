@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
 Compare C vs Python implementation for asymmetric penalties.
+
+Tests by: Johan Nygaard Vinther
 """
 import numpy as np
 from dtaidistance import dtw

@@ -3,6 +3,7 @@ Test asymmetric penalty feature for DTW.
 
 This tests that penalty_s1 and penalty_s2 work independently and produce
 different results when set to different values.
+Tests by: Johan Nygaard Vinther
 """
 import math
 import pytest

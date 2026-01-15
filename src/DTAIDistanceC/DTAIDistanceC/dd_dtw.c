@@ -3,7 +3,9 @@
 @brief DTAIDistance.dtw
 
 @author Wannes Meert
+@author Johan Nygaard Vinther (Added asymmetric penalties for expanding/compressing series)
 @copyright Copyright © 2020 Wannes Meert. Apache License, Version 2.0, see LICENSE for details.
+@copyright Copyright © 2026 Johan Nygaard Vinther. Apache License, Version 2.0, see LICENSE for details.
 */
 #include "dd_dtw.h"
 
@@ -1157,9 +1159,9 @@ seq_t dtw_warping_paths_ndim(seq_t *wps,
                 d += SEDIST(s1[ri_idx + d_i], s2[ci_idx + d_i]);
             }
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi - 1], // diagonal
-                                            wps[ri_widthp + wpsi] + p.penalty);
+                                            wps[ri_widthp + wpsi] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -1207,9 +1209,9 @@ seq_t dtw_warping_paths_ndim(seq_t *wps,
             }
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
             // B-region assumes wps has the same column indices in the previous row
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi - 1],  // Diagonal
-                                            wps[ri_widthp + wpsi] + p.penalty);
+                                            wps[ri_widthp + wpsi] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -1257,9 +1259,9 @@ seq_t dtw_warping_paths_ndim(seq_t *wps,
             }
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
             // C-region assumes wps has the column indices in the previous row shifted by one
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi],  // Diagonal
-                                            wps[ri_widthp + wpsi + 1] + p.penalty);
+                                            wps[ri_widthp + wpsi + 1] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -1317,9 +1319,9 @@ seq_t dtw_warping_paths_ndim(seq_t *wps,
             }
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
             // D-region assumes wps has the same column indices in the previous row
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi - 1],  // Diagonal
-                                            wps[ri_widthp + wpsi] + p.penalty);
+                                            wps[ri_widthp + wpsi] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -1529,9 +1531,9 @@ seq_t dtw_warping_paths_ndim_euclidean(seq_t *wps,
             }
             d = sqrt(d);
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi - 1], // diagonal
-                                            wps[ri_widthp + wpsi] + p.penalty);
+                                            wps[ri_widthp + wpsi] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -1580,9 +1582,9 @@ seq_t dtw_warping_paths_ndim_euclidean(seq_t *wps,
             d = sqrt(d);
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
             // B-region assumes wps has the same column indices in the previous row
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi - 1],  // Diagonal
-                                            wps[ri_widthp + wpsi] + p.penalty);
+                                            wps[ri_widthp + wpsi] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -1631,9 +1633,9 @@ seq_t dtw_warping_paths_ndim_euclidean(seq_t *wps,
             d = sqrt(d);
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
             // C-region assumes wps has the column indices in the previous row shifted by one
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi],  // Diagonal
-                                            wps[ri_widthp + wpsi + 1] + p.penalty);
+                                            wps[ri_widthp + wpsi + 1] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -1692,9 +1694,9 @@ seq_t dtw_warping_paths_ndim_euclidean(seq_t *wps,
             d = sqrt(d);
             if (d > p.max_step) { wps[ri_width + wpsi] = INFINITY; wpsi++; continue;}
             // D-region assumes wps has the same column indices in the previous row
-            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty,
+            wps[ri_width + wpsi] = d + MIN3(wps[ri_width  + wpsi - 1] + p.penalty_s2,  // horizontal = expand s2
                                             wps[ri_widthp + wpsi - 1],  // Diagonal
-                                            wps[ri_widthp + wpsi] + p.penalty);
+                                            wps[ri_widthp + wpsi] + p.penalty_s1);  // vertical = expand s1
             // PrunedDTW
             if (wps[ri_width + wpsi] <= p.max_dist) {
                 smaller_found = true;
@@ -3326,8 +3328,8 @@ idx_t dtw_best_path(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l2,
             i2[i] = cip - 1;
             i++;
         }
-        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty) {
+        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3353,8 +3355,8 @@ idx_t dtw_best_path(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l2,
             i2[i] = cip - 1;
             i++;
         }
-        if (wps[ri_widthp + wpsi] <= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi] <= wps[ri_widthp + wpsi + 1] + p.penalty) {
+        if (wps[ri_widthp + wpsi] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi] <= wps[ri_widthp + wpsi + 1] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3380,8 +3382,8 @@ idx_t dtw_best_path(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l2,
             i2[i] = cip - 1;
             i++;
         }
-        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty) {
+        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3441,8 +3443,8 @@ idx_t dtw_best_path_customstart(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_
             i2[i] = cip - 1;
             i++;
         }
-        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty) {
+        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3468,8 +3470,8 @@ idx_t dtw_best_path_customstart(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_
             i2[i] = cip - 1;
             i++;
         }
-        if (wps[ri_widthp + wpsi] <= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi] <= wps[ri_widthp + wpsi + 1] + p.penalty) {
+        if (wps[ri_widthp + wpsi] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi] <= wps[ri_widthp + wpsi + 1] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3495,8 +3497,8 @@ idx_t dtw_best_path_customstart(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_
             i2[i] = cip - 1;
             i++;
         }
-        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty) {
+        if (wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3564,8 +3566,8 @@ idx_t dtw_best_path_isclose(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l2
             i2[i] = cip - 1;
             i++;
         }
-        if ((wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_width  + wpsi - 1] + p.penalty) <= (atol + rtol * fabs(wps[ri_width  + wpsi - 1] + p.penalty))) &&
-            (wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_widthp + wpsi] + p.penalty) <= (atol + rtol * fabs(wps[ri_widthp + wpsi] + p.penalty)))) {
+        if ((wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_width  + wpsi - 1] + p.penalty_s2) <= (atol + rtol * fabs(wps[ri_width  + wpsi - 1] + p.penalty_s2))) &&
+            (wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty_s1 || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_widthp + wpsi] + p.penalty_s1) <= (atol + rtol * fabs(wps[ri_widthp + wpsi] + p.penalty_s1)))) {
             // Go diagonal
             cip--;
             rip--;
@@ -3591,8 +3593,8 @@ idx_t dtw_best_path_isclose(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l2
             i2[i] = cip - 1;
             i++;
         }
-        if ((wps[ri_widthp + wpsi] <= wps[ri_width  + wpsi - 1] + p.penalty || fabs(wps[ri_widthp + wpsi] - wps[ri_width  + wpsi - 1] + p.penalty) <= (atol + rtol * fabs(wps[ri_width  + wpsi - 1] + p.penalty))) &&
-            (wps[ri_widthp + wpsi] <= wps[ri_widthp + wpsi + 1] + p.penalty || fabs(wps[ri_widthp + wpsi] - wps[ri_widthp + wpsi + 1] + p.penalty) <= (atol + rtol * fabs(wps[ri_widthp + wpsi + 1] + p.penalty)))) {
+        if ((wps[ri_widthp + wpsi] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 || fabs(wps[ri_widthp + wpsi] - wps[ri_width  + wpsi - 1] + p.penalty_s2) <= (atol + rtol * fabs(wps[ri_width  + wpsi - 1] + p.penalty_s2))) &&
+            (wps[ri_widthp + wpsi] <= wps[ri_widthp + wpsi + 1] + p.penalty_s1 || fabs(wps[ri_widthp + wpsi] - wps[ri_widthp + wpsi + 1] + p.penalty_s1) <= (atol + rtol * fabs(wps[ri_widthp + wpsi + 1] + p.penalty_s1)))) {
             // Go diagonal
             cip--;
             rip--;
@@ -3618,8 +3620,8 @@ idx_t dtw_best_path_isclose(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l2
             i2[i] = cip - 1;
             i++;
         }
-        if ((wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_width  + wpsi - 1] + p.penalty) <= (atol + rtol * fabs(wps[ri_width  + wpsi - 1] + p.penalty))) &&
-            (wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_widthp + wpsi] + p.penalty) <= (atol + rtol * fabs(wps[ri_widthp + wpsi] + p.penalty)))) {
+        if ((wps[ri_widthp + wpsi - 1] <= wps[ri_width  + wpsi - 1] + p.penalty_s2 || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_width  + wpsi - 1] + p.penalty_s2) <= (atol + rtol * fabs(wps[ri_width  + wpsi - 1] + p.penalty_s2))) &&
+            (wps[ri_widthp + wpsi - 1] <= wps[ri_widthp + wpsi] + p.penalty_s1 || fabs(wps[ri_widthp + wpsi - 1] - wps[ri_widthp + wpsi] + p.penalty_s1) <= (atol + rtol * fabs(wps[ri_widthp + wpsi] + p.penalty_s1)))) {
             // Go diagonal
             cip--;
             rip--;
@@ -3682,8 +3684,8 @@ idx_t dtw_best_path_affinity(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l
             // printf("wps[%zu,%zu] = wps[%zu] = %.3f\n", rip, cip, ri_width + wpsi, wps[ri_width + wpsi]);
             i++;
         }
-        if (wps[ri_widthp + wpsi - 1] >= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi - 1] >= wps[ri_widthp + wpsi] + p.penalty) {
+        if (wps[ri_widthp + wpsi - 1] >= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi - 1] >= wps[ri_widthp + wpsi] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3712,8 +3714,8 @@ idx_t dtw_best_path_affinity(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l
             // printf("wps[%zu,%zu] = wps[%zu] = %.3f\n", rip, cip, ri_width + wpsi, wps[ri_width + wpsi]);
             i++;
         }
-        if (wps[ri_widthp + wpsi] >= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi] >= wps[ri_widthp + wpsi + 1] + p.penalty) {
+        if (wps[ri_widthp + wpsi] >= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi] >= wps[ri_widthp + wpsi + 1] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -3742,8 +3744,8 @@ idx_t dtw_best_path_affinity(seq_t *wps, idx_t *i1, idx_t *i2, idx_t l1, idx_t l
             // printf("wps[%zu,%zu] = wps[%zu] = %.3f\n", rip, cip, ri_width + wpsi, wps[ri_width + wpsi]);
             i++;
         }
-        if (wps[ri_widthp + wpsi - 1] >= wps[ri_width  + wpsi - 1] + p.penalty &&
-            wps[ri_widthp + wpsi - 1] >= wps[ri_widthp + wpsi] + p.penalty) {
+        if (wps[ri_widthp + wpsi - 1] >= wps[ri_width  + wpsi - 1] + p.penalty_s2 &&
+            wps[ri_widthp + wpsi - 1] >= wps[ri_widthp + wpsi] + p.penalty_s1) {
             // Go diagonal
             cip--;
             rip--;
@@ -4010,8 +4012,23 @@ DTWWps dtw_wps_parts(idx_t l1, idx_t l2, DTWSettings * settings) {
     parts.window = settings->window;
     parts.max_step = settings->max_step;
     parts.penalty = settings->penalty;
+    parts.penalty_s1 = settings->penalty_s1;
+    parts.penalty_s2 = settings->penalty_s2;
+    
+    // For backward compatibility: if asymmetric penalties are not set, use symmetric penalty
+    if (parts.penalty_s1 == 0 && parts.penalty_s2 == 0 && parts.penalty != 0) {
+        parts.penalty_s1 = parts.penalty;
+        parts.penalty_s2 = parts.penalty;
+    }
+    
     if (settings->inner_dist == 0) {
         parts.penalty = pow(settings->penalty, 2);
+        if (parts.penalty_s1 != 0) {
+            parts.penalty_s1 = pow(parts.penalty_s1, 2);
+        }
+        if (parts.penalty_s2 != 0) {
+            parts.penalty_s2 = pow(parts.penalty_s2, 2);
+        }
     }
     if (parts.max_step == 0) {
         parts.max_step = INFINITY;

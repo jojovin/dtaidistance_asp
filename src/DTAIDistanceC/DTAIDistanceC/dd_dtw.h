@@ -3,7 +3,9 @@
 @brief DTAIDistance.dtw : Dynamic Time Warping
 
 @author Wannes Meert
+@author Johan Nygaard Vinther (Added asymmetric penalties for expanding/compressing series)
 @copyright Copyright © 2020-2025 Wannes Meert. Apache License, Version 2.0, see LICENSE for details.
+@copyright Copyright © 2026 Johan Nygaard Vinther. Apache License, Version 2.0, see LICENSE for details.
 */
 
 #ifndef dtw_h
