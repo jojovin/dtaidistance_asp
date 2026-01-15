@@ -3,6 +3,9 @@
 [![Documentation Status](https://readthedocs.org/projects/dtaidistance/badge/?version=latest)](https://dtaidistance.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/80764246.svg)](https://zenodo.org/badge/latestdoi/80764246) 
 
+# This version includes asymmetric expansion/compression penalties
+It is fully compatible with the original version though.
+
 # Time Series Distances
 
 Library for time series distances (e.g. Dynamic Time Warping) used in the

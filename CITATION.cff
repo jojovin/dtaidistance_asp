@@ -19,8 +19,10 @@ authors:
 - family-names: "Davis"
   given-names: "Jesse"
   orcid: "https://orcid.org/0000-0002-3748-9263"
-title: "DTAIDistance"
-version: 2
-doi: 10.5281/zenodo.3981067
-date-released: 2020-08-11
-url: "https://github.com/wannesm/dtaidistance"
+- family-names: "Vinther"
+  given-names: "Johan Nygaard"
+  orcid: "https://orcid.org/0000-0002-7229-7347"
+title: "DTAIDistance with Asymmetric Penalties"
+version: 2.1
+date-released: 2026-1-15
+url: "https://github.com/jojovin/dtaidistance_asp"
