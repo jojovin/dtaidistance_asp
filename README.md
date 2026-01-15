@@ -7,6 +7,15 @@
 It is fully compatible with the original version though. 
 Install instructions identical to the original version source install. 
 
+Installation:
+
+```bash
+    echo "Building package..."
+    python setup.py build_ext --inplace
+    python3 setup.py install
+    echo "You can test with: python example_asymmetric_penalty.py"
+```
+
 Use: 
 ```python
 from dtaidistance import dtw
