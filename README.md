@@ -19,7 +19,7 @@ Installation:
 Use: 
 ```python
 from dtaidistance import dtw
-settings = dtw.DTWSettings(penalty_s1=1.0, penalty_s2=0.5)
+settings = dtw.DTWSettings(penalty_s1=1.0, penalty_s2=0.5) # use_c=True is also implemented
 d = dtw.distance(s1, s2, settings=settings)
 ```
 
