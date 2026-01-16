@@ -2,7 +2,6 @@
 # Script to rebuild and reinstall the package with the asymmetric penalty changes
 
 echo "Rebuilding dtaidistance package..."
-cd /Users/au606858/Documents/dtai_work
 
 # Clean old build artifacts
 echo "Cleaning old build artifacts..."

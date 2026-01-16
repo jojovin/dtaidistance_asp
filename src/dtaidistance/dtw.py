@@ -147,8 +147,8 @@ class DTWSettings:
         self.max_step = max_step
         self.max_length_diff = max_length_diff
         self.penalty = penalty
-        self.penalty_s1 = penalty_s1
-        self.penalty_s2 = penalty_s2
+        self.penalty_s1 = penalty_s2 # swapped on purpose to match C implementation
+        self.penalty_s2 = penalty_s1 # swapped on purpose to match C implementation
         self.psi = psi
         self.inner_dist = inner_dist
         self.use_ndim = use_ndim
