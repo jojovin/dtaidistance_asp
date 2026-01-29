@@ -1144,17 +1144,27 @@ def warp(from_s, to_s, path=None, **kwargs):
     return from_s2, path
 
 
-def best_path(paths, row=None, col=None, use_max=False, penalty=0):
+def best_path(paths, row=None, col=None, use_max=False, penalty=0, penalty_s1=None, penalty_s2=None):
     """Compute the optimal path from the nxm warping paths matrix.
 
     :param paths: Warping paths matrix
     :param row: If given, start from this row (instead of lower-right corner)
     :param col: If given, start from this column (instead of lower-right corner)
     :param use_max: Find maximal path instead of minimal path
-    :param penalty: The penalty used.
+    :param penalty: The penalty used (symmetric, backward compatible).
         If this is used, then paths should be expressed as the internal representation.
+    :param penalty_s1: Penalty for expanding series 1 (vertical move in matrix).
+        If None, falls back to penalty parameter.
+    :param penalty_s2: Penalty for expanding series 2 (horizontal move in matrix).
+        If None, falls back to penalty parameter.
     :return: Array of (row, col) or (ts_1_idx, ts_2_idx) representing the best path
     """
+    # Handle asymmetric penalties with backward compatibility
+    if penalty_s1 is None:
+        penalty_s1 = penalty
+    if penalty_s2 is None:
+        penalty_s2 = penalty
+
     if use_max:
         argm = argmax
     else:
@@ -1172,8 +1182,8 @@ def best_path(paths, row=None, col=None, use_max=False, penalty=0):
         p.append((i - 1, j - 1))
     while i > 0 and j > 0:
         c = argm([paths[i - 1, j - 1],
-                  paths[i - 1, j] + penalty,
-                  paths[i, j - 1] + penalty])
+                  paths[i - 1, j] + penalty_s1,  # expanding s1 (vertical)
+                  paths[i, j - 1] + penalty_s2])  # expanding s2 (horizontal)
         if c == 0:
             i, j = i - 1, j - 1
         elif c == 1:
